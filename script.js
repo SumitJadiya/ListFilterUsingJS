@@ -1,22 +1,24 @@
-let favBtn = document.querySelectorAll('.fav-btn');
-let delBtn = document.querySelectorAll('.del-btn');
 const textbox = document.querySelector('#textbox');
+let samplebtn = document.querySelector('.items');
 
-function handleClicks() {
-    for (let i = 0; i < favBtn.length; i++) {
-        favBtn[i].addEventListener('click', (e) => {
-            handleClickFavoriteBtn(e, i)
-        })
+samplebtn.addEventListener("click", (e) => {
 
-        delBtn[i].addEventListener('click', (e) => {
-            handleClickDeleteBtn(e)
-        })
+    if (e.target.className.includes('star'))
+        handleClickFavoriteBtn(e)
+    else if (e.target.className.includes('trash'))
+        handleClickDeleteBtn(e)
+})
+
+// initialise
+function initialiseList() {
+    let list = fetchDataFromLS()
+    for (let i = 0; i < list.length; i++) {
+        buildList(list[i]);
     }
 }
 
-function handleClickFavoriteBtn(e, i) {
+function handleClickFavoriteBtn(e) {
     e.preventDefault();
-    console.log(i)
     let item = e.target.className;
 
     (item.includes('far')) ?
@@ -29,6 +31,13 @@ function handleClickDeleteBtn(e) {
     e.preventDefault();
     let item = e.target.parentNode.parentNode.parentNode;
     item.remove();
+
+    if (typeof window !== 'undefined' && window) {
+        let arr = JSON.parse(localStorage.getItem('friends')) || [];
+        arr.splice(arr.indexOf(item.innerHTML), 1);
+        console.log(arr)
+        localStorage.setItem('friends', JSON.stringify(arr));
+    }
 }
 
 function removeListeners() {
@@ -53,6 +62,17 @@ textbox.addEventListener("keyup", (e) => {
 
 // add item in list
 function addItem(item) {
+
+    buildList(item);
+
+    if (typeof window !== 'undefined' && window) {
+        const arr = JSON.parse(localStorage.getItem('friends')) || [];
+        arr.push(item)
+        localStorage.setItem('friends', JSON.stringify(arr));
+    }
+}
+
+function buildList(item) {
     let list = document.querySelector('#items');
     let li = document.createElement('li');
     let span = document.createElement('span');
@@ -62,18 +82,6 @@ function addItem(item) {
     li.innerHTML = item;
     li.appendChild(span);
     list.appendChild(li);
-
-    favBtn = document.querySelectorAll('.fav-btn');
-    delBtn = document.querySelectorAll('.del-btn');
-
-    if (typeof window !== 'undefined' && window) {
-        const arr = JSON.parse(localStorage.getItem('friends')) || [];
-        arr.push(item)
-        localStorage.setItem('friends', JSON.stringify(arr));
-    }
-
-    removeListeners()
-    handleClicks()
 }
 
 function buildAnchors(span) {
@@ -90,3 +98,10 @@ function buildAnchors(span) {
     span.appendChild(anchor);
     span.appendChild(anchorTwo);
 }
+
+function fetchDataFromLS() {
+    let arr = JSON.parse(localStorage.getItem('friends')) || [];
+    return arr;
+}
+
+initialiseList()

@@ -34,11 +34,7 @@ body {
   border: 1px solid #000;
 }
 
-.item {
-  width: 97%;
-}
-
-.item .textbox {
+.textbox {
   display: block;
   width: 97%;
   margin: 1em auto;
@@ -46,7 +42,8 @@ body {
   font-size: 20px;
 }
 
-.item:not(:first-child) {
+.item {
+  width: 97%;
   padding: 0.5em;
   display: flex;
   justify-content: space-between;
