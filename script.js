@@ -5,13 +5,39 @@ const textbox = document.querySelector('#textbox');
 function handleClicks() {
     for (let i = 0; i < favBtn.length; i++) {
         favBtn[i].addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleFavourite(i)
+            handleClickFavoriteBtn(e, i)
         })
 
         delBtn[i].addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log("del", i)
+            handleClickDeleteBtn(e)
+        })
+    }
+}
+
+function handleClickFavoriteBtn(e, i) {
+    e.preventDefault();
+    console.log(i)
+    let item = e.target.className;
+
+    (item.includes('far')) ?
+        e.target.className = 'fas fa-star'
+        :
+        e.target.className = 'far fa-star'
+}
+
+function handleClickDeleteBtn(e) {
+    e.preventDefault();
+    let item = e.target.parentNode.parentNode.parentNode;
+    item.remove();
+}
+
+function removeListeners() {
+    for (let i = 0; i < favBtn.length; i++) {
+        favBtn[i].removeEventListener("click", (e) => {
+            handleClickFavoriteBtn(e, i)
+        })
+        delBtn[i].removeEventListener("click", (e) => {
+            handleClickDeleteBtn(e)
         })
     }
 }
@@ -40,6 +66,13 @@ function addItem(item) {
     favBtn = document.querySelectorAll('.fav-btn');
     delBtn = document.querySelectorAll('.del-btn');
 
+    if (typeof window !== 'undefined' && window) {
+        const arr = JSON.parse(localStorage.getItem('friends')) || [];
+        arr.push(item)
+        localStorage.setItem('friends', JSON.stringify(arr));
+    }
+
+    removeListeners()
     handleClicks()
 }
 
@@ -56,9 +89,4 @@ function buildAnchors(span) {
 
     span.appendChild(anchor);
     span.appendChild(anchorTwo);
-}
-
-function toggleFavourite(i) {
-
-    favBtn[i].classList.toggle('active');
 }
