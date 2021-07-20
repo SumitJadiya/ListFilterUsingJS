@@ -51,15 +51,6 @@ function removeListeners() {
     }
 }
 
-textbox.addEventListener("keyup", (e) => {
-    e.preventDefault();
-    if (e.keyCode === 13) {
-        let text = textbox.value;
-        addItem(text);
-        textbox.value = '';
-    }
-})
-
 // add item in list
 function addItem(item) {
 
@@ -103,5 +94,31 @@ function fetchDataFromLS() {
     let arr = JSON.parse(localStorage.getItem('friends')) || [];
     return arr;
 }
+
+function debounce(func, timeout = 1000) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+function saveInput() {
+    console.log('Saving data');
+}
+
+const processChange = debounce(() => saveInput());
+
+// listeners
+textbox.addEventListener("keyup", (e) => {
+    e.preventDefault();
+    if (e.keyCode === 13) {
+        let text = textbox.value;
+        addItem(text);
+        textbox.value = '';
+    }
+})
+
+textbox.addEventListener("keypress", processChange)
 
 initialiseList()
