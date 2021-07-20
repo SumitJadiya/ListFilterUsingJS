@@ -1,22 +1,18 @@
 const textbox = document.querySelector('#textbox');
-let samplebtn = document.querySelector('.items');
-
-samplebtn.addEventListener("click", (e) => {
-
-    if (e.target.className.includes('star'))
-        handleClickFavoriteBtn(e)
-    else if (e.target.className.includes('trash'))
-        handleClickDeleteBtn(e)
-})
+let items = document.querySelector('.items');
 
 // initialise
-function initialiseList() {
-    let list = fetchDataFromLS()
-    for (let i = 0; i < list.length; i++) {
+function initialiseList(list) {
+    for (let i = 0; i < list.length; i++)
         buildList(list[i]);
-    }
 }
 
+function fetchDataFromLS() {
+    return JSON.parse(localStorage.getItem('friends')) || [];
+}
+
+
+// handle favorites
 function handleClickFavoriteBtn(e) {
     e.preventDefault();
     let item = e.target.className;
@@ -27,27 +23,16 @@ function handleClickFavoriteBtn(e) {
         e.target.className = 'far fa-star'
 }
 
+// handle delete
 function handleClickDeleteBtn(e) {
     e.preventDefault();
-    let item = e.target.parentNode.parentNode.parentNode;
-    item.remove();
+    let mainItem = e.target.parentNode.parentNode.parentNode;
+    mainItem.remove();
 
     if (typeof window !== 'undefined' && window) {
         let arr = JSON.parse(localStorage.getItem('friends')) || [];
-        arr.splice(arr.indexOf(item.innerHTML), 1);
-        console.log(arr)
-        localStorage.setItem('friends', JSON.stringify(arr));
-    }
-}
-
-function removeListeners() {
-    for (let i = 0; i < favBtn.length; i++) {
-        favBtn[i].removeEventListener("click", (e) => {
-            handleClickFavoriteBtn(e, i)
-        })
-        delBtn[i].removeEventListener("click", (e) => {
-            handleClickDeleteBtn(e)
-        })
+        var filteredAry = arr.filter(function (item) { return mainItem.innerText !== item })
+        localStorage.setItem('friends', JSON.stringify(filteredAry));
     }
 }
 
@@ -55,7 +40,6 @@ function removeListeners() {
 function addItem(item) {
 
     buildList(item);
-
     if (typeof window !== 'undefined' && window) {
         const arr = JSON.parse(localStorage.getItem('friends')) || [];
         arr.push(item)
@@ -63,6 +47,7 @@ function addItem(item) {
     }
 }
 
+// build list
 function buildList(item) {
     let list = document.querySelector('#items');
     let li = document.createElement('li');
@@ -75,6 +60,7 @@ function buildList(item) {
     list.appendChild(li);
 }
 
+// build anchors
 function buildAnchors(span) {
     let anchor = document.createElement('a');
     anchor.className = "btn fav-btn";
@@ -90,12 +76,13 @@ function buildAnchors(span) {
     span.appendChild(anchorTwo);
 }
 
-function fetchDataFromLS() {
-    let arr = JSON.parse(localStorage.getItem('friends')) || [];
-    return arr;
+// clear list items
+function clearList() {
+    items.innerHTML = '';
 }
 
-function debounce(func, timeout = 1000) {
+// debouncing
+function debounce(func, timeout = 500) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -103,13 +90,31 @@ function debounce(func, timeout = 1000) {
     };
 }
 
+// search in list and print result
 function saveInput() {
-    console.log('Saving data');
+    let input = textbox.value;
+    let arr = fetchDataFromLS();
+    let result = [];
+
+    for (let i = 0; i < arr.length; i++)
+        if (arr[i].toLowerCase().includes(input.toLowerCase())) result.push(arr[i]);
+
+    clearList()
+    initialiseList(result)
+    console.log(result)
+    return result;
 }
 
 const processChange = debounce(() => saveInput());
 
 // listeners
+items.addEventListener("click", (e) => {
+    if (e.target.className.includes('star'))
+        handleClickFavoriteBtn(e)
+    else if (e.target.className.includes('trash'))
+        handleClickDeleteBtn(e)
+})
+
 textbox.addEventListener("keyup", (e) => {
     e.preventDefault();
     if (e.keyCode === 13) {
@@ -119,6 +124,7 @@ textbox.addEventListener("keyup", (e) => {
     }
 })
 
-textbox.addEventListener("keypress", processChange)
+textbox.addEventListener("keyup", processChange)
 
-initialiseList()
+// go to point
+initialiseList(fetchDataFromLS())
