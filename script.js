@@ -1,17 +1,8 @@
-const data = {
-    "data": [
-        { "name": "Sumit", "is_fav": 'true' },
-        { "name": "Jadiya", "is_fav": 'N' },
-        { "name": "STJ", "is_fav": 'N' },
-        { "name": "Sachin", "is_fav": 'Y' },
-        { "name": "Babuji", "is_fav": 'Y' },
-        { "name": "Praful", "is_fav": 'N' },
-        { "name": "Hansa", "is_fav": 'Y' },
-    ]
-}
+const data = fetchDataFromLS()
 
 const textbox = document.querySelector('#textbox');
 let items = document.querySelector('.items');
+let sortBy = document.querySelector('.sortbyList');
 
 // initialise
 function initialiseList(list) {
@@ -36,9 +27,9 @@ function handleClickFavoriteBtn(e) {
     if (typeof window !== 'undefined' && window) {
         let arr = JSON.parse(localStorage.getItem('friends')) || [];
         var filteredAry = arr.map((item) => {
-            if (e.target.parentNode.parentNode.parentNode.innerText === item.name) {
+            if (e.target.parentNode.parentNode.parentNode.innerText === item.name)
                 item.is_fav = !item.is_fav
-            }
+
             return item
         });
 
@@ -54,7 +45,7 @@ function handleClickDeleteBtn(e) {
 
     if (typeof window !== 'undefined' && window) {
         let arr = JSON.parse(localStorage.getItem('friends')) || [];
-        var filteredAry = arr.filter(function (item) { return mainItem.innerText !== item })
+        var filteredAry = arr.filter(function (item) { return mainItem.innerText !== item.name })
         localStorage.setItem('friends', JSON.stringify(filteredAry));
     }
 }
@@ -119,12 +110,8 @@ function saveInput() {
     let arr = fetchDataFromLS();
     let result = [];
 
-    console.log(arr[0].name)
-
-    for (let i = 0; i < arr.length; i++) {
-        console.log(arr[i].name)
-        if ((arr[i].name).toLowerCase().includes(input.toLowerCase())) result.push(arr[i].name);
-    }
+    for (let i = 0; i < arr.length; i++)
+        if ((arr[i].name).toLowerCase().includes(input.toLowerCase())) result.push(arr[i]);
 
     clearList()
     initialiseList(result)
@@ -133,6 +120,39 @@ function saveInput() {
 
 const processChange = debounce(() => saveInput());
 
+// sorting
+function sortItem(sortAttr) {
+
+    let data = fetchDataFromLS();
+    sortListByAttr(data, sortAttr)
+    clearList()
+    initialiseList(data)
+}
+
+function sortListByAttr(data, sortAttr) {
+    for (let j = 0; j < data.length - 1; j++) {
+
+        let maxHelper = getMaxDataObject(data, j, sortAttr)
+
+        let max_location = maxHelper['max_index']
+        data[max_location] = data[j]
+        data[j] = maxHelper['max_object']
+    }
+    return data
+}
+
+function getMaxDataObject(data, start, sortAttr) {
+    let maximum = data[start];
+    let max_location = start
+
+    for (let i = start; i < data.length; i++) {
+        if (sortAttr === 'name' && (data[i][sortAttr]).toLowerCase() > maximum[sortAttr].toLowerCase() || data[i][sortAttr] > maximum[sortAttr]) {
+            maximum = data[i]
+            max_location = i
+        }
+    }
+    return { max_object: maximum, max_index: max_location }
+}
 // listeners
 items.addEventListener("click", (e) => {
     if (e.target.className.includes('star'))
@@ -151,6 +171,10 @@ textbox.addEventListener("keyup", (e) => {
 })
 
 textbox.addEventListener("keyup", processChange)
+
+sortBy.addEventListener("change", (e) => {
+    sortItem(e.target.value)
+})
 
 // go to point
 initialiseList(fetchDataFromLS())
