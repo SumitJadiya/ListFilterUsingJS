@@ -16,6 +16,17 @@ body {
   align-items: center;
 }
 
+.sub-container {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.sortbyList {
+  border: 0;
+  margin-left: 1rem;
+  font-size: 1.2rem;
+}
+
 .list-box {
   width: 800px;
 }
@@ -36,8 +47,9 @@ body {
 
 .textbox {
   display: block;
-  width: 97%;
-  margin: 1em auto;
+  width: 90%;
+  /* margin: 1em auto; */
+  /* margin: 1em 0; */
   padding: 0.5em;
   font-size: 20px;
 }

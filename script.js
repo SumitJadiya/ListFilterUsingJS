@@ -1,3 +1,15 @@
+const data = {
+    "data": [
+        { "name": "Sumit", "is_fav": 'true' },
+        { "name": "Jadiya", "is_fav": 'N' },
+        { "name": "STJ", "is_fav": 'N' },
+        { "name": "Sachin", "is_fav": 'Y' },
+        { "name": "Babuji", "is_fav": 'Y' },
+        { "name": "Praful", "is_fav": 'N' },
+        { "name": "Hansa", "is_fav": 'Y' },
+    ]
+}
+
 const textbox = document.querySelector('#textbox');
 let items = document.querySelector('.items');
 
@@ -11,16 +23,27 @@ function fetchDataFromLS() {
     return JSON.parse(localStorage.getItem('friends')) || [];
 }
 
-
 // handle favorites
 function handleClickFavoriteBtn(e) {
     e.preventDefault();
-    let item = e.target.className;
+    let mainItem = e.target.className;
 
-    (item.includes('far')) ?
+    (mainItem.includes('far')) ?
         e.target.className = 'fas fa-star'
         :
         e.target.className = 'far fa-star'
+
+    if (typeof window !== 'undefined' && window) {
+        let arr = JSON.parse(localStorage.getItem('friends')) || [];
+        var filteredAry = arr.map((item) => {
+            if (e.target.parentNode.parentNode.parentNode.innerText === item.name) {
+                item.is_fav = !item.is_fav
+            }
+            return item
+        });
+
+        localStorage.setItem('friends', JSON.stringify(filteredAry));
+    }
 }
 
 // handle delete
@@ -52,20 +75,20 @@ function buildList(item) {
     let list = document.querySelector('#items');
     let li = document.createElement('li');
     let span = document.createElement('span');
-    buildAnchors(span)
+    buildAnchors(span, item)
 
     li.className = 'item';
-    li.innerHTML = item;
+    li.innerHTML = item.name;
     li.appendChild(span);
     list.appendChild(li);
 }
 
 // build anchors
-function buildAnchors(span) {
+function buildAnchors(span, item) {
     let anchor = document.createElement('a');
     anchor.className = "btn fav-btn";
     anchor.href = "#"
-    anchor.innerHTML = '<i class="far fa-star"></i>';
+    anchor.innerHTML = (item.is_fav) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
 
     let anchorTwo = document.createElement('a');
     anchorTwo.className = "btn del-btn";
@@ -96,12 +119,15 @@ function saveInput() {
     let arr = fetchDataFromLS();
     let result = [];
 
-    for (let i = 0; i < arr.length; i++)
-        if (arr[i].toLowerCase().includes(input.toLowerCase())) result.push(arr[i]);
+    console.log(arr[0].name)
+
+    for (let i = 0; i < arr.length; i++) {
+        console.log(arr[i].name)
+        if ((arr[i].name).toLowerCase().includes(input.toLowerCase())) result.push(arr[i].name);
+    }
 
     clearList()
     initialiseList(result)
-    console.log(result)
     return result;
 }
 
@@ -118,8 +144,8 @@ items.addEventListener("click", (e) => {
 textbox.addEventListener("keyup", (e) => {
     e.preventDefault();
     if (e.keyCode === 13) {
-        let text = textbox.value;
-        addItem(text);
+        let textObj = { "name": textbox.value, "is_fav": false };
+        addItem(textObj);
         textbox.value = '';
     }
 })

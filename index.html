@@ -15,13 +15,20 @@
     <main class="container">
       <div class="list-box">
         <h3 class="title">Friends List</h3>
-        <input
-          class="textbox"
-          id="textbox"
-          placeholder="Start Typing... "
-          type="text"
-          autofocus
-        />
+        <div class="sub-container">
+          <input
+            class="textbox"
+            id="textbox"
+            placeholder="Start Typing... "
+            type="text"
+            autofocus
+          />
+          <select class="sortbyList">
+            <option value="0" selected disabled>Sort By..</option>
+            <option value="1">Name</option>
+            <option value="2">Favourite</option>
+          </select>
+        </div>
         <ul class="items" id="items">
           <!-- <li class="item">
             Sumit Jadiya
