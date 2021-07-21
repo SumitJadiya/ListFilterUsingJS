@@ -56,7 +56,9 @@ function addItem(item) {
     buildList(item);
     if (typeof window !== 'undefined' && window) {
         const arr = JSON.parse(localStorage.getItem('friends')) || [];
-        arr.push(item)
+        if (!arr.find(listItem => listItem.name === item.name))
+            arr.push(item)
+        clearList()
         localStorage.setItem('friends', JSON.stringify(arr));
     }
 }
@@ -153,6 +155,7 @@ function getMaxDataObject(data, start, sortAttr) {
     }
     return { max_object: maximum, max_index: max_location }
 }
+
 // listeners
 items.addEventListener("click", (e) => {
     if (e.target.className.includes('star'))
